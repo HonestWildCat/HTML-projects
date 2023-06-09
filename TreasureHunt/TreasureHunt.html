@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta lang="russian">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Find the spider</title>
+        <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+        <style>
+            body{
+                text-align: center;
+                font-size: 1.5em;
+                min-height: 100%;
+/*                overflow: hidden;*/
+            }
+            #map{
+                width: 192vh;
+                height: 108vh;
+				border: 1vh solid black;
+				border-radius: 2vh;
+            }
+			#spider{
+				z-index: 100;
+				position: absolute;
+				opacity: 0.8;
+			}
+            #modal{
+                position: fixed;
+				top: 0;
+				bottom: 0;
+				right: 0;
+				left: 0;
+				overflow: hidden;
+				display: none;
+				z-index: 99;
+				background-color: #5f5f5f3a;
+            }
+            #modal_content{
+                background-color: rgba(255,255,255,0.7);
+				min-width: 10vh;
+				padding: 1%;
+				margin: 20vh 35vh 10vh 35vh;
+				border-radius: 2vh;
+				border-left: 1vh solid grey;
+				border-top: 1vh solid grey;
+				box-shadow: -1vh -1vh 0vh 0vh rgba(51,51,51,1.00) inset;
+            }			
+            input{
+                font-size: 1.2em;
+                border-radius: 1vh;
+				background-color: rgba(255,255,255,0.7);
+				width: 25vh;
+            }
+			#modal2{
+				position: fixed;
+				top: 0;
+				left: 0;
+				overflow: hidden;
+				display: inline;
+				z-index: 98;
+				background-color: rgba(255,255,255,0.7);
+				border-radius: 2vh;
+				margin: 2vh;
+			}
+        </style>
+    </head>
+    <body>
+        <h1>Найди паука.</h1>
+		<img id="spider" src="sider.png" alt="spider" onClick="gameEnd(true)">
+        <img id="map" src="Treasure map.jpg" alt="map" onClick="mapClicked()">
+		
+		<div id="modal2">
+			<p id="hint">-</p>
+			<p id="attempts">Осталось попыток: -</p>
+		</div>
+		
+		<div id="modal">
+            <div id="modal_content">
+                <h2 id="result"></h2>
+				<div id="info"></div>
+                <input type="button" value="Играть снова" onclick="closing()">
+            </div>
+        </div>
+
+        <script>
+			var spider = document.getElementById("spider").getBoundingClientRect();
+			var modal = document.getElementById("modal2").style;
+			var spider_pos = document.getElementById("spider").style;
+			var map = document.getElementById("map").getBoundingClientRect();
+			var attempt = 0;
+			var attemptsLeft = 10;
+			var time = 0;
+			var interval_id = 0;
+			
+			function hideSpider(){
+				spider_pos.left = (Math.random() * map.right) + map.left + "px";
+				spider_pos.top = (Math.random() * map.bottom) + map.top + "px";
+				//alert(spider_pos.left + " " + spider_pos.top)
+			};
+			
+			function gameEnd(bool){
+				document.getElementById("modal").style.display = "inline";
+				spider_pos.display = "none";
+				attempt ++;
+				clearInterval(interval_id);
+				if(bool){
+					$("#result").text("Вы выиграли!");
+					$("#info").html("<p><b>Время:</b> " + countTime() + "</p><p><b>Попытки:</b> " + attempt + "</p>");
+				}
+				else{
+					$("#result").text("Вы проиграли!");
+					$("#info").html("<p><b>Время:</b> " + countTime() + "</p>");
+				};
+				attempt = 0;
+				interval_id = setInterval(function(){time++}, 1000);
+				time = 0;
+				attemptsLeft = 10;
+				$("#attempts").html("Попыток: " + attemptsLeft);
+				$("#hint").html("-");
+			};
+			
+			function countTime(){
+				var sec = time;
+				var min = 0;
+				var hour = 0;
+				var timeInfo = "";
+				while(sec >= 60){
+					min ++;
+					sec -= 60
+				};
+				while(min >= 60){
+					hour ++;
+					min -= 60
+				};
+				
+				if(hour > 0){
+					timeInfo += hour + "час. ";
+				};
+				if(min > 0){
+					timeInfo += min + "мин. ";
+				};
+				timeInfo += sec + "сек. ";
+				return(timeInfo);
+			};
+			
+			function mapClicked(){
+				attempt ++;
+				attemptsLeft --;
+				$("#attempts").html("Попыток: " + attemptsLeft);
+				if(attemptsLeft < 1){
+					gameEnd(false);
+				};
+			};
+			
+			function closing(){
+				document.getElementById("modal").style.display = "none";
+				hideSpider();
+				spider_pos.display = "inline";
+			};
+			
+			
+			
+			
+			function mouseCoordinates(event){
+				var diffX = Number(spider_pos.left.slice(0, spider_pos.left.length - 2)) - event.pageX + 7;
+				var diffY = Number(spider_pos.top.slice(0, spider_pos.top.length - 2)) - event.pageY + 7;
+				var n = Math.floor(Math.sqrt((diffX ** 2) + (diffY ** 2)));
+				var msg = "-";
+				if(n < 50){
+					msg = "Обожжёшся!";
+				}
+				else if(n < 100){
+					msg = "Горячо.";
+				}
+				else if(n < 200){
+					msg = "Тепло.";
+				}
+				else if(n < 400){
+					msg = "Прохладно.";
+				}
+				else if(n < 600){
+					msg = "Холодно.";
+				}
+				else if(n < 800){
+					msg = "Очень холодно!";
+				}
+				else{
+					msg = "Замерзнешь!";
+				}
+				$("#hint").html(msg);
+			};
+			
+			hideSpider();
+			interval_id = setInterval(function(){time++}, 1000);
+			$("#map").click(mouseCoordinates);
+			$("#attempts").html("Попыток: " + attemptsLeft);
+			modal.left = map.left;
+			modal.top = map.top;
+        </script>
+    </body>
+</html>

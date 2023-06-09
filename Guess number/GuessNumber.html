@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Guess number</title>
+    <style>
+        body{
+            font-size: 55px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  	
+            background: rgb(240,255,224);
+            background: radial-gradient(circle, rgba(240,255,224,1) 0%, rgba(93,176,193,1) 42%, rgba(43,43,120,1) 100%) no-repeat center fixed;
+            background-size: cover;;
+        }
+        
+        .num{
+            background-color: rgba(226, 231, 252, 0.5);
+            width: 25%;
+            min-height: 190px;
+            font-size: 60px;
+            font-weight: bold;
+            border-radius: 15px;
+            margin: 0.5%;
+            border: 10px solid rgba(14, 20, 87, 0.8);
+        }
+
+        .num:hover{
+            background-color: rgba(6, 18, 47, 0.2);
+            border: 10px solid rgba(7, 15, 45, 0.8);
+        }
+
+        .num:disabled{
+            background-color: rgba(192, 234, 238, 0.2);
+            border: 10px solid rgba(92, 142, 171, 0.8);
+        }
+        
+        #printed{
+            padding-bottom: 3%;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            height: 50px;
+            border-bottom: 5px solid black;
+        }
+
+        #keys{
+            text-align: center;
+        }
+
+        table{
+            background-color:#476599;
+            text-align: center;
+            margin: auto;
+            border-spacing: 0 10px;
+            border-radius: 25px;
+        }
+
+        th{
+            padding: 5px 30px;
+            background-color: #476599;
+            color: white;
+        }
+
+        td{
+            border: 5px solid #476599;
+        }
+        #result tbody tr:nth-child(odd){
+            background:rgba(243, 245, 255, 0.8);
+        }
+
+        #result tbody tr:nth-child(even){
+            background:rgba(195, 224, 255, 0.8);
+        }
+
+        #result tr td:first-child, .table tr th:first-child {
+	        border-left: none;
+        }
+        #result tr td:last-child, .table tr th:last-child {
+            border-right: none;
+        }
+    </style>
+</head>
+<body onload="onload()">
+    <div id="printed"></div>
+    <div id="keys" onclick="any_key_pressed()">
+        <div>
+            <input type="button" value="1" class="num" id="1"onclick="one()">
+            <input type="button" value="2" class="num" id="2"onclick="two()">
+            <input type="button" value="3" class="num" id="3"onclick="three()">
+        </div>
+        <div>
+            <input type="button" value="4" class="num" id="4"onclick="four()">
+            <input type="button" value="5" class="num" id="5"onclick="five()">
+            <input type="button" value="6" class="num" id="6"onclick="six()">
+        </div>
+        <div>
+            <input type="button" value="7" class="num" id="7"onclick="seven()">
+            <input type="button" value="8" class="num" id="8"onclick="eight()">
+            <input type="button" value="9" class="num" id="9"onclick="nine()">
+        </div>
+        <input type="button" value="&#11044" class="num" id="marker" onclick="mark()">
+        <input type="button" value="0" class="num" id="0"onclick="zero()">
+        <input type="button" value="&#5176" class="num" id="del"onclick="del()">
+    </div>
+    <div id="result_table">
+        <table id="result">
+            <tr>
+                <th>№</th>
+                <th>Число</th>
+                <th>Общее</th>
+                <th>На месте</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        var maxlength = 4;
+        var attempt = 1;
+        var prompt = "";
+        var mode = "play";
+
+        var list = [];
+
+        function num_len(){
+            len = document.getElementById("printed").innerHTML;
+            if (len.length > (maxlength - 1)){
+                for(let i = 0; i < 10; i ++){
+                document.getElementById(i).setAttribute('disabled', 'disabled');
+                };
+                enter();
+            };
+        };
+
+        function any_key_pressed(){
+            num_len();
+        };
+
+        function onload(){
+            document.getElementById("printed").innerHTML = "";
+            hidden_number = num_choose();
+        };
+
+        function one(){
+            react("1", 1)
+        };
+        function two(){
+            react("2", 2)
+        };
+        function three(){
+            react("3", 3)
+        };
+        function four(){
+            react("4", 4)
+        };
+        function five(){
+            react("5", 5)
+        };
+        function six(){
+            react("6", 6)
+        };
+        function seven(){
+            react("7", 7)
+        };
+        function eight(){
+            react("8", 8)
+        };
+        function nine(){
+            react("9", 9)
+        };
+        function zero(){
+            react("0", 0)
+        };
+
+        function react(identiti, nmbr){
+            if(mode === "play"){
+                document.getElementById("printed").innerHTML += nmbr;
+                document.getElementById(identiti).setAttribute('disabled', 'disabled');
+                list.push(identiti);
+            }
+            else{
+                if(document.getElementById(identiti).style.backgroundColor === "rgba(130, 20, 20, 0.5)"){
+                    document.getElementById(identiti).style.backgroundColor = "rgba(20, 100, 20, 0.5)";
+                }
+                else if(document.getElementById(identiti).style.backgroundColor === "rgba(20, 100, 20, 0.5)"){
+                    document.getElementById(identiti).style.backgroundColor = "rgba(226, 231, 252, 0.5)";
+                }
+                else{
+                    document.getElementById(identiti).style.backgroundColor = "rgba(130, 20, 20, 0.5)";
+                };
+            };
+        };
+
+        function del(){
+            document.getElementById("printed").innerHTML = document.getElementById("printed").innerHTML.slice(0,document.getElementById("printed").innerHTML.length - 1);
+            el = list.pop()
+            document.getElementById(el).removeAttribute('disabled');
+        };
+        function mark(){
+            if(mode === "play"){
+                mode = "mark";
+                document.getElementById("marker").value = "\u2716";
+                document.getElementById("marker").style.backgroundColor = "rgba(7, 14, 124, 0.5)";
+            }
+            else{
+                mode = "play";
+                document.getElementById("marker").value = "\u2B24";
+                document.getElementById("marker").style.backgroundColor = "rgba(226, 231, 252, 0.5)";
+            };
+
+        };
+        function enter(){
+            if(document.getElementById("printed").innerHTML.length === maxlength){
+                var answer = document.getElementById("printed").innerHTML;
+                if(answer === hidden_number){
+                    confirm("\u2605Верно!\u2605");
+                    hidden_number = num_choose();
+                    attempt = 0;
+                    prompt = "";
+                    for(let i = 0; i < 10; i ++){
+                        document.getElementById(i).style.backgroundColor = "rgba(226, 231, 252, 0.5)"
+                    };
+                }
+                else{
+                    var in_place = 0;
+                    var in_general = 0;
+                    for(let i = 0; i < maxlength; i ++){
+                        if(hidden_number[i] === answer[i]){
+                            in_place += 1;
+                            in_general += 1;
+                        }
+                        else if(hidden_number.indexOf(answer[i]) != -1){
+                            in_general += 1;
+                        };
+                    };
+                };
+                add_values(answer, in_place, in_general);
+                document.getElementById("printed").innerHTML = "";
+                list = [];
+                for(let i = 0; i < 10; i ++){
+                    document.getElementById(i).removeAttribute('disabled');
+                };
+            };
+        };
+
+        function num_choose(){
+            var hidden_number = [];
+            var i = 0;
+            while(hidden_number.length < 4){
+                m = Math.floor(Math.random() * 10);
+                if(!(hidden_number.includes(m))){
+                    hidden_number[i] = m;
+                    i ++;
+                };
+            };
+            hidden_number = hidden_number.join("");
+            return hidden_number;
+        };
+
+        function add_values(answer, in_place, in_general){
+            if(attempt === 0){
+                document.getElementById("result").innerHTML = "<tr><th>№</th><th>Число</th><th>Общее</th><th>На месте</th></tr>"
+            }
+            else{
+                prompt = "<tr><td>" + attempt + "</td><td>" + answer + "</td><td>" + in_general + "</td><td>" + in_place + "</td></tr>" + prompt
+                document.getElementById("result").innerHTML = "<tr><th>№</th><th>Число</th><th>Общее</th><th>На месте</th></tr>" + prompt;
+            };
+            attempt ++;
+        };
+    </script>
+</body>
+</html>
